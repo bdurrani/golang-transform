@@ -18,6 +18,7 @@ func setupEngine() *gin.Engine {
 		Db: db,
 	}
 	router.GET("/user/:name", control.GetUser)
+	router.POST("/upload", controllers.HandleUpload)
 	return router
 }
 
