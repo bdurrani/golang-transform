@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/bdurrani/golang-transform/controllers"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 var db = map[string]string{
@@ -21,9 +22,16 @@ func setupEngine() *gin.Engine {
 }
 
 func main() {
+	config, err := GetConfig()
+	checkerr(err)
 	router := setupEngine()
 
 	_ = router.SetTrustedProxies([]string{"127.0.0.1"})
-	// Listen and Server in 0.0.0.0:8080
-	_ = router.Run(":8080")
+	_ = router.Run(":" + config.Port)
+}
+
+func checkerr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
