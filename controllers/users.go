@@ -14,7 +14,6 @@ type Controller struct {
 func (base *Controller) GetUser(context *gin.Context) {
 	context.String(http.StatusOK, "pong")
 	fmt.Printf("ClientIP: %s\n", context.ClientIP())
-
 	user := context.Params.ByName("name")
 	value, ok := base.Db[user]
 	if ok {
