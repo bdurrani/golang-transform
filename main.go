@@ -36,7 +36,7 @@ func setupEngine() *gin.Engine {
 	router.SetFuncMap(template.FuncMap{
 		"formatAsDate": formatAsDate,
 	})
-	// router.LoadHTMLFiles("./templates/raw.tmpl")
+
 	router.LoadHTMLGlob("templates/*.tmpl")
 	control := controllers.Controller{
 		Db: db,

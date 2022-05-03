@@ -35,7 +35,7 @@ func HandleUpload(c *gin.Context) {
 
 func Index(c *gin.Context) {
 	index := gin.H{
-		"title": "Main website",
+		"title": "Transformation",
 	}
 	c.HTML(http.StatusOK, "index.tmpl", index)
 }
