@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,6 +14,7 @@ func HandleUpload(c *gin.Context) {
 	file, _ := c.FormFile("file")
 	log.Println(file.Filename)
 
+	setupTmpDirectory("upload")
 	// openFile, err := file.Open()
 	// if err != nil {
 	// 	panic(err)
@@ -38,4 +41,9 @@ func Index(c *gin.Context) {
 		"title": "Main website",
 	}
 	c.HTML(http.StatusOK, "index.tmpl", index)
+}
+
+func setupTmpDirectory(dirName string) error {
+	tmpPath := filepath.Join("/tmp", dirName)
+	return os.MkdirAll(tmpPath, os.ModePerm)
 }
