@@ -31,8 +31,13 @@ func HandleUpload(c *gin.Context) {
 
 	// io.Copy(tmpFile, openFile)
 	// Upload the file to specific dst.
-	c.SaveUploadedFile(file, "./test.jpg")
-
+	err := c.SaveUploadedFile(file, "./test.jpg")
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Unable to save uploaded file")
+		return
+	}
+	file.Open()
+	// c.Data(http.StatusOK, "image/png", )
 	c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
 
@@ -43,7 +48,12 @@ func Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", index)
 }
 
-func setupTmpDirectory(dirName string) error {
+func setupTmpDirectory(dirName string) (string, error) {
 	tmpPath := filepath.Join("/tmp", dirName)
-	return os.MkdirAll(tmpPath, os.ModePerm)
+	err := os.MkdirAll(tmpPath, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return tmpPath, nil
 }
