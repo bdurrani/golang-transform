@@ -9,11 +9,11 @@ import (
 func TestTransformers(t *testing.T) {
 	t.Run("setting up temp directory succeeds", func(t *testing.T) {
 		tmpDirName := uuid.New().String()
-		err := setupTmpDirectory(tmpDirName)
+		tmpPath, err := setupTmpDirectory(tmpDirName)
 		if err != nil {
 			t.Errorf("err was not null")
 		}
-		_, err = os.Stat("/tmp/" + tmpDirName)
+		_, err = os.Stat(tmpPath)
 		exists := !os.IsNotExist(err)
 		if exists != true {
 			t.Errorf("got %t, wanted %t", exists, true)
