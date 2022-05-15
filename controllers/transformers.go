@@ -3,6 +3,7 @@ package controllers
 import (
 	"io/ioutil"
 	"log"
+	"mime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,7 +13,8 @@ import (
 
 func HandleUpload(c *gin.Context) {
 	file, _ := c.FormFile("file")
-	log.Println(file.Filename)
+	mimeType := mime.TypeByExtension(filepath.Ext(file.Filename))
+	log.Println(file.Filename + " " + mimeType)
 
 	tmpDirectory, err := setupTmpDirectory("upload")
 	if err != nil {
@@ -31,7 +33,7 @@ func HandleUpload(c *gin.Context) {
 		return
 	}
 
-	c.Data(http.StatusOK, "image/png", data)
+	c.Data(http.StatusOK, mimeType, data)
 	//c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
 }
 
