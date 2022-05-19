@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"io/ioutil"
+	"fmt"
 	"log"
 	"mime"
 	"net/http"
@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/google/uuid"
 )
 
 func HandleUpload(c *gin.Context) {
@@ -21,20 +23,22 @@ func HandleUpload(c *gin.Context) {
 		return
 	}
 
+	id := uuid.New()
 	// Upload the file to specific dst.
-	saveLocation := filepath.Join(tmpDirectory, file.Filename)
+	saveLocation := filepath.Join(tmpDirectory, id.String())
 	err = c.SaveUploadedFile(file, saveLocation)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Unable to save uploaded file")
 		return
 	}
-	data, err := ioutil.ReadFile(saveLocation)
-	if err != nil {
-		return
-	}
+	// data, err := ioutil.ReadFile(saveLocation)
+	// if err != nil {
+	// 	return
+	// }
 
-	c.Data(http.StatusOK, mimeType, data)
-	//c.String(http.StatusOK, fmt.Sprintf("'%s' uploaded!", file.Filename))
+	redirUrl := fmt.Sprintf("/assets/%s", id.String())
+	c.Redirect(http.StatusMovedPermanently, redirUrl)
+	// c.Data(http.StatusOK, mimeType, data)
 }
 
 func Index(c *gin.Context) {

@@ -41,6 +41,8 @@ func setupEngine() *gin.Engine {
 		Db: db,
 	}
 
+	router.StaticFS("assets", http.Dir("/tmp/upload"))
+
 	router.GET("/user/:name", control.GetUser)
 	router.GET("/", controllers.Index)
 	router.POST("/upload", controllers.HandleUpload)
