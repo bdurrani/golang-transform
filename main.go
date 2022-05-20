@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/bdurrani/golang-transform/controllers"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,7 +42,7 @@ func setupEngine() *gin.Engine {
 		Db: db,
 	}
 
-	router.StaticFS("assets", http.Dir("/tmp/upload"))
+	router.Use(static.Serve("/assets/", static.LocalFile("/tmp/upload", false)))
 
 	router.GET("/user/:name", control.GetUser)
 	router.GET("/", controllers.Index)
