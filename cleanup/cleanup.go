@@ -1,6 +1,7 @@
 package cleanup
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -15,6 +16,13 @@ func filesToCleanup(path string) ([]string, error) {
 	for _, file := range files {
 		if !file.IsDir() {
 			filesToDelete = append(filesToDelete, file.Name())
+			info, err := file.Info()
+
+			if err != nil {
+				continue
+			}
+
+			fmt.Println("Last modified time : ", info.ModTime())
 		}
 	}
 	return filesToDelete, nil
