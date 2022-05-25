@@ -2,7 +2,11 @@ package cleanup
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func filesToCleanup(path string) ([]string, error) {
@@ -26,4 +30,22 @@ func filesToCleanup(path string) ([]string, error) {
 		}
 	}
 	return filesToDelete, nil
+}
+
+func StartCleanup() {
+	go SessionCleanupTask()
+}
+
+func SessionCleanupTask() {
+	quit := make(chan os.Signal, 1) // buffered
+	signal.Notify(quit, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	for {
+		select {
+		case sig := <-quit:
+			log.Println("all done", sig)
+			return
+		case <-time.After(time.Second * 5):
+			log.Println("peek: SessionCleanupTask")
+		}
+	}
 }

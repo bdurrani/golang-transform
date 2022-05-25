@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"github.com/bdurrani/golang-transform/cleanup"
 	"html/template"
 	"log"
 	"net/http"
@@ -61,6 +62,7 @@ func setupEngine() *gin.Engine {
 func main() {
 	config, err := GetConfig()
 	checkerr(err)
+	cleanup.StartCleanup()
 	router := setupEngine()
 	_ = router.SetTrustedProxies([]string{"127.0.0.1"})
 	_ = router.Run(":" + config.Port)
