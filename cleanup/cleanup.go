@@ -49,3 +49,21 @@ func SessionCleanupTask() {
 		}
 	}
 }
+
+func SessionCleanupTask1(quit chan os.Signal) {
+	ticker := time.NewTicker(5 * time.Second)
+	for {
+		select {
+		case sig := <-quit:
+			log.Println("all done", sig)
+			return
+		case <-time.After(time.Second * 1):
+			log.Println("peek: SessionCleanupTask")
+		//default:
+		//	log.Println("poll")
+		case <-ticker.C:
+			log.Println("peek: clean up tick")
+
+		}
+	}
+}
