@@ -69,7 +69,8 @@ func main() {
 	// Wait for interrupt signal to gracefully shut down the server with
 	// a timeout of 5 seconds.
 	quit := make(chan os.Signal, 1)
-	cleanup.StartCleanup()
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	cleanup.StartCleanup(quit)
 	router := setupEngine()
 	_ = router.SetTrustedProxies([]string{"127.0.0.1"})
 	srv := &http.Server{
@@ -86,7 +87,6 @@ func main() {
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be caught, so don't need to add it
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("Shutting down server...")
 

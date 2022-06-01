@@ -32,8 +32,8 @@ func filesToCleanup(path string) ([]string, error) {
 	return filesToDelete, nil
 }
 
-func StartCleanup() {
-	go SessionCleanupTask()
+func StartCleanup(quit chan os.Signal) {
+	go sessionCleanupTask1(quit)
 }
 
 func SessionCleanupTask() {
@@ -42,7 +42,7 @@ func SessionCleanupTask() {
 	for {
 		select {
 		case sig := <-quit:
-			log.Println("all done", sig)
+			log.Println("shut down clean up routine", sig)
 			return
 		case <-time.After(time.Second * 5):
 			log.Println("peek: SessionCleanupTask")
@@ -50,20 +50,15 @@ func SessionCleanupTask() {
 	}
 }
 
-func SessionCleanupTask1(quit chan os.Signal) {
+func sessionCleanupTask1(quit chan os.Signal) {
 	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case sig := <-quit:
-			log.Println("all done", sig)
+			log.Println("shut down clean up routine", sig)
 			return
-		case <-time.After(time.Second * 1):
-			log.Println("peek: SessionCleanupTask")
-		//default:
-		//	log.Println("poll")
 		case <-ticker.C:
 			log.Println("peek: clean up tick")
-
 		}
 	}
 }
