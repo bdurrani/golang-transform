@@ -1,11 +1,10 @@
 package cleanup
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -32,30 +31,16 @@ func filesToCleanup(path string) ([]string, error) {
 	return filesToDelete, nil
 }
 
-func StartCleanup(quit chan os.Signal) {
-	go sessionCleanupTask1(quit)
+func StartCleanup(quit context.Context) {
+	go sessionCleanupTask(quit)
 }
 
-func SessionCleanupTask() {
-	quit := make(chan os.Signal, 1) // buffered
-	signal.Notify(quit, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	for {
-		select {
-		case sig := <-quit:
-			log.Println("shut down clean up routine", sig)
-			return
-		case <-time.After(time.Second * 5):
-			log.Println("peek: SessionCleanupTask")
-		}
-	}
-}
-
-func sessionCleanupTask1(quit chan os.Signal) {
+func sessionCleanupTask(quit context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	for {
 		select {
-		case sig := <-quit:
-			log.Println("shut down clean up routine", sig)
+		case <-quit.Done():
+			log.Println("shut down clean up routine")
 			return
 		case <-ticker.C:
 			log.Println("peek: clean up tick")

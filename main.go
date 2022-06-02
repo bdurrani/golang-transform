@@ -8,7 +8,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -66,11 +65,10 @@ func setupEngine() *gin.Engine {
 func main() {
 	config, err := GetConfig()
 	checkerr(err)
-	// Wait for interrupt signal to gracefully shut down the server with
-	// a timeout of 5 seconds.
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	cleanup.StartCleanup(quit)
+	// Create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	cleanup.StartCleanup(ctx)
 	router := setupEngine()
 	_ = router.SetTrustedProxies([]string{"127.0.0.1"})
 	srv := &http.Server{
@@ -87,7 +85,7 @@ func main() {
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be caught, so don't need to add it
-	<-quit
+	<-ctx.Done()
 	log.Println("Shutting down server...")
 
 	// The context is used to inform the server it has 5 seconds to finish
@@ -99,7 +97,6 @@ func main() {
 	}
 
 	log.Println("Server exiting")
-
 }
 
 func checkerr(err error) {
